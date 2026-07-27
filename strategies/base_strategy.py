@@ -12,7 +12,7 @@ class BaseStrategy(ABC):
     def __init__(self):
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         self._score = 0.0
         self._comments: list[str] = []
         self._score_items: list[ScoreItem] = []
@@ -47,11 +47,18 @@ class BaseStrategy(ABC):
         result: tuple[float, str],
     ) -> None:
         """
-        Tar emot resultatet från en score_*()-funktion och
-        registrerar poängen.
+        Tar emot resultatet från en score_*()-funktion.
+
+        score_*()-funktionerna returnerar:
+            (ratio, comment)
+
+        där ratio är ett värde mellan 0.0 och 1.0.
+        Här omvandlas ratio till faktiska poäng med hjälp av max_points.
         """
 
-        points, comment = result
+        ratio, comment = result
+        points = ratio * max_points
+
         self.add_score(
             name=name,
             points=points,

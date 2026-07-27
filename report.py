@@ -55,6 +55,9 @@ def print_report(
     if qm.debt_ratio is not None:
         print(f"Skuldsättningsgrad: {qm.debt_ratio:.2f}")
 
+    if qm.equity_ratio is not None:
+        print(f"Soliditet: {qm.equity_ratio:.1f}%")
+
     if qm.roe is not None:
         print(f"ROE: {qm.roe:.1f}%")
 

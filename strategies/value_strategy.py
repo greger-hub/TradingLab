@@ -16,68 +16,68 @@ ROIC_KPI = 37
 
 def score_pe(value):
     if value <= 10:
-        return 20, "✅ Mycket låg P/E"
+        return 1.0, "✅ Mycket låg P/E"
     elif value <= 15:
-        return 16, "✅ Attraktiv P/E"
+        return 0.8, "✅ Attraktiv P/E"
     elif value <= 20:
-        return 12, "🟡 Rimlig P/E"
+        return 0.6, "🟡 Rimlig P/E"
     else:
-        return 6, "❌ Hög P/E"
+        return 0.2, "❌ Hög P/E"
 
 
 def score_pb(value):
     if value <= 1:
-        return 15, "✅ Mycket låg P/B"
+        return 1.0, "✅ Mycket låg P/B"
     elif value <= 2:
-        return 12, "✅ Attraktiv P/B"
+        return 0.8, "✅ Attraktiv P/B"
     elif value <= 4:
-        return 8, "🟡 Rimlig P/B"
+        return 0.6, "🟡 Rimlig P/B"
     else:
-        return 3, "❌ Hög P/B"
+        return 0.2, "❌ Hög P/B"
 
 
 def score_ev_ebit(value):
     if value <= 10:
-        return 20, "✅ Låg EV/EBIT"
+        return 1.0, "✅ Låg EV/EBIT"
     elif value <= 15:
-        return 16, "🟡 Rimlig EV/EBIT"
+        return 0.8, "🟡 Rimlig EV/EBIT"
     elif value <= 20:
-        return 10, "🟡 Hög EV/EBIT"
+        return 0.5, "🟡 Hög EV/EBIT"
     else:
-        return 4, "❌ Mycket hög EV/EBIT"
+        return 0.2, "❌ Mycket hög EV/EBIT"
 
 
 def score_ev_ebitda(value):
     if value <= 8:
-        return 15, "✅ Låg EV/EBITDA"
+        return 1.0, "✅ Låg EV/EBITDA"
     elif value <= 12:
-        return 12, "🟡 Rimlig EV/EBITDA"
+        return 0.8, "🟡 Rimlig EV/EBITDA"
     elif value <= 16:
-        return 8, "🟡 Hög EV/EBITDA"
+        return 0.5, "🟡 Hög EV/EBITDA"
     else:
-        return 3, "❌ Mycket hög EV/EBITDA"
+        return 0.2, "❌ Mycket hög EV/EBITDA"
 
 
 def score_dividend(value):
     if value >= 5:
-        return 15, "✅ Hög direktavkastning"
+        return 1.0, "✅ Hög direktavkastning"
     elif value >= 3:
-        return 12, "🟡 Bra direktavkastning"
+        return 0.8, "🟡 Bra direktavkastning"
     elif value >= 2:
-        return 8, "🟡 Acceptabel direktavkastning"
+        return 0.6, "🟡 Acceptabel direktavkastning"
     else:
-        return 3, "❌ Låg direktavkastning"
+        return 0.2, "❌ Låg direktavkastning"
 
 
 def score_roic(value):
     if value >= 20:
-        return 15, "✅ Exceptionell ROIC"
+        return 1.0, "✅ Exceptionell ROIC"
     elif value >= 15:
-        return 12, "✅ Stark ROIC"
+        return 0.8, "✅ Stark ROIC"
     elif value >= 10:
-        return 8, "🟡 Bra ROIC"
+        return 0.6, "🟡 Bra ROIC"
     else:
-        return 3, "❌ Svag ROIC"
+        return 0.2, "❌ Svag ROIC"
 
 
 class ValueStrategy(BaseStrategy):

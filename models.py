@@ -26,6 +26,7 @@ class Metrics:
 
     operating_margin: float | None = None
     debt_ratio: float | None = None
+    equity_ratio: float | None = None
     roe: float | None = None
     revenue_growth: float | None = None
     profit_growth: float | None = None

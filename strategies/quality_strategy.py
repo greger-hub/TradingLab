@@ -1,6 +1,9 @@
+from api import get_kpi
+
 from metrics import (
     calculate_operating_margin,
     calculate_debt_ratio,
+    calculate_equity_ratio,
     calculate_roe,
     calculate_growth,
 )
@@ -10,60 +13,91 @@ from models import Metrics
 from .base_strategy import BaseStrategy
 
 
+ROIC_KPI = 37
+
+
 def score_margin(value):
     if value >= 20:
-        return 25, "✅ Mycket hög rörelsemarginal"
+        return 1.0, "✅ Mycket hög rörelsemarginal"
     elif value >= 15:
-        return 20, "✅ Stark rörelsemarginal"
+        return 0.8, "✅ Stark rörelsemarginal"
     elif value >= 10:
-        return 15, "🟡 Godkänd rörelsemarginal"
+        return 0.6, "🟡 Godkänd rörelsemarginal"
     else:
-        return 5, "❌ Låg rörelsemarginal"
+        return 0.2, "❌ Låg rörelsemarginal"
 
 
 def score_debt(value):
     if value < 0.5:
-        return 25, "✅ Låg skuldsättning"
+        return 1.0, "✅ Låg skuldsättning"
     elif value < 1.0:
-        return 20, "🟡 Acceptabel skuldsättning"
+        return 0.8, "🟡 Acceptabel skuldsättning"
     else:
-        return 10, "❌ Hög skuldsättning"
+        return 0.4, "❌ Hög skuldsättning"
+
+
+def score_equity_ratio(value):
+    if value is None:
+        return 0.0, "❓ Soliditet saknas"
+
+    if value >= 50:
+        return 1.0, "✅ Mycket stark soliditet"
+    elif value >= 40:
+        return 0.8, "✅ Stark soliditet"
+    elif value >= 30:
+        return 0.6, "🟡 Godkänd soliditet"
+    else:
+        return 0.2, "❌ Låg soliditet"
 
 
 def score_roe(value):
     if value >= 20:
-        return 25, "✅ Mycket hög ROE"
+        return 1.0, "✅ Mycket hög ROE"
     elif value >= 15:
-        return 20, "✅ Stark ROE"
+        return 0.8, "✅ Stark ROE"
     elif value >= 10:
-        return 15, "🟡 Godkänd ROE"
+        return 0.6, "🟡 Godkänd ROE"
     else:
-        return 5, "❌ Låg ROE"
+        return 0.2, "❌ Låg ROE"
+
+
+def score_roic(value):
+    if value is None:
+        return 0.0, "❓ ROIC saknas"
+
+    if value >= 20:
+        return 1.0, "✅ Exceptionell ROIC"
+    elif value >= 15:
+        return 0.8, "✅ Stark ROIC"
+    elif value >= 10:
+        return 0.6, "🟡 Bra ROIC"
+    else:
+        return 0.2, "❌ Svag ROIC"
 
 
 def score_growth(revenue_growth, profit_growth):
-    points = 0
+    ratio = 0.0
 
     for growth in (revenue_growth, profit_growth):
         if growth >= 15:
-            points += 12.5
+            ratio += 0.5
         elif growth >= 10:
-            points += 10
+            ratio += 0.4
         elif growth >= 5:
-            points += 7.5
+            ratio += 0.3
         elif growth > 0:
-            points += 5
+            ratio += 0.2
 
-    if points >= 20:
-        kommentar = "📈 Mycket stark tillväxt"
-    elif points >= 10:
-        kommentar = "📈 God tillväxt"
-    elif points > 0:
-        kommentar = "📈 Svag men positiv tillväxt"
+    if ratio >= 0.8:
+        comment = "📈 Mycket stark tillväxt"
+    elif ratio >= 0.6:
+        comment = "📈 God tillväxt"
+    elif ratio > 0:
+        comment = "📈 Svag men positiv tillväxt"
     else:
-        kommentar = "📉 Ingen eller negativ tillväxt"
+        comment = "📉 Ingen eller negativ tillväxt"
 
-    return points, kommentar
+    return ratio, comment
 
 
 class QualityStrategy(BaseStrategy):
@@ -75,72 +109,65 @@ class QualityStrategy(BaseStrategy):
         previous_report,
         instrument_id,
     ):
-        """
-        Returnerar ett AnalysisResult.
-
-        instrument_id används inte ännu, men ingår för att alla
-        strategier ska ha samma gränssnitt.
-        """
-
         self.reset()
 
-        operating_margin = calculate_operating_margin(current_report)
-        debt_ratio = calculate_debt_ratio(current_report)
-        roe = calculate_roe(current_report)
-
-        revenue_growth = calculate_growth(
-            current_report,
-            previous_report,
-            "revenues",
-        )
-
-        profit_growth = calculate_growth(
-            current_report,
-            previous_report,
-            "profit_To_Equity_Holders",
-        )
+        roic = get_kpi(ROIC_KPI).get(instrument_id)
 
         metrics = Metrics(
-            operating_margin=operating_margin,
-            debt_ratio=debt_ratio,
-            roe=roe,
-            revenue_growth=revenue_growth,
-            profit_growth=profit_growth,
+            operating_margin=calculate_operating_margin(current_report),
+            debt_ratio=calculate_debt_ratio(current_report),
+            equity_ratio=calculate_equity_ratio(current_report),
+            roe=calculate_roe(current_report),
+            revenue_growth=calculate_growth(
+                current_report,
+                previous_report,
+                "revenues",
+            ),
+            profit_growth=calculate_growth(
+                current_report,
+                previous_report,
+                "profit_To_Equity_Holders",
+            ),
+            roic=roic,
         )
 
-        points, kommentar = score_margin(metrics.operating_margin)
-        self.add_score(
+        self.score(
             "Rörelsemarginal",
-            points,
-            25,
-            kommentar,
+            20,
+            score_margin(metrics.operating_margin),
         )
 
-        points, kommentar = score_debt(metrics.debt_ratio)
-        self.add_score(
+        self.score(
             "Skuldsättning",
-            points,
-            25,
-            kommentar,
+            15,
+            score_debt(metrics.debt_ratio),
         )
 
-        points, kommentar = score_roe(metrics.roe)
-        self.add_score(
+        self.score(
+            "Soliditet",
+            15,
+            score_equity_ratio(metrics.equity_ratio),
+        )
+
+        self.score(
             "ROE",
-            points,
-            25,
-            kommentar,
+            20,
+            score_roe(metrics.roe),
         )
 
-        points, kommentar = score_growth(
-            metrics.revenue_growth,
-            metrics.profit_growth,
+        self.score(
+            "ROIC",
+            20,
+            score_roic(metrics.roic),
         )
-        self.add_score(
+
+        self.score(
             "Tillväxt",
-            points,
-            25,
-            kommentar,
+            10,
+            score_growth(
+                metrics.revenue_growth,
+                metrics.profit_growth,
+            ),
         )
 
         return self.build_result(metrics)

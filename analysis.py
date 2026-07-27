@@ -10,6 +10,28 @@ from screening_result import ScreeningResult
 from report import print_report
 
 
+def _select_reports(reports):
+    """
+    Returnerar den senaste rapporten och den senaste rapporten
+    från föregående räkenskapsår.
+    """
+
+    if not reports:
+        return None, None
+
+    latest = reports[0]
+    latest_year = latest["year"]
+
+    previous = None
+
+    for report in reports[1:]:
+        if report["year"] < latest_year:
+            previous = report
+            break
+
+    return latest, previous
+
+
 def analyze_instrument(ticker: str) -> ScreeningResult | None:
     """
     Analyze a single instrument.
@@ -29,8 +51,10 @@ def analyze_instrument(ticker: str) -> ScreeningResult | None:
     if reports is None or len(reports) < 2:
         return None
 
-    latest = reports[0]
-    previous = reports[1]
+    latest, previous = _select_reports(reports)
+
+    if latest is None or previous is None:
+        return None
 
     quality_result = QualityStrategy().evaluate(
         latest,
