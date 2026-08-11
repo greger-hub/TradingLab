@@ -23,6 +23,7 @@ def print_report(
     previous,
     quality_result: AnalysisResult,
     value_result: AnalysisResult,
+    growth_result: AnalysisResult,
     investment_result: InvestmentResult,
 ):
     """
@@ -104,11 +105,32 @@ def print_report(
     print(f"\nValue Score: {investment_result.value_score:.1f}/100")
 
     #
+    # GROWTH
+    #
+
+    print("\n================ GROWTH =================")
+
+    gm = growth_result.metrics
+
+    if gm.revenue_growth is not None:
+        print(f"Omsättningstillväxt: {gm.revenue_growth:.1f}%")
+
+    if gm.profit_growth is not None:
+        print(f"Vinsttillväxt: {gm.profit_growth:.1f}%")
+
+    if gm.peg is not None:
+        print(f"PEG: {gm.peg:.2f}")
+
+    if hasattr(investment_result, "growth_score"):
+        print(f"\nGrowth Score: {investment_result.growth_score:.1f}/100")
+
+    #
     # ANALYS
     #
 
     print_score_items("QUALITY ANALYSIS", quality_result)
     print_score_items("VALUE ANALYSIS", value_result)
+    print_score_items("GROWTH ANALYSIS", growth_result)
 
     #
     # TOTAL

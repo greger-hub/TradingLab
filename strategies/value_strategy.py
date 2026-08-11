@@ -1,4 +1,4 @@
-from metrics_loader import get_kpi
+from api import get_kpi
 from models import Metrics
 
 from .base_strategy import BaseStrategy

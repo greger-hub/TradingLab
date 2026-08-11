@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from strategies.base_strategy import AnalysisResult
+from models import AnalysisResult
 from investment_strategy import InvestmentResult
 
 
@@ -17,5 +17,6 @@ class ScreeningResult:
 
     quality: AnalysisResult
     value: AnalysisResult
+    growth: AnalysisResult
 
     investment: InvestmentResult

@@ -2,6 +2,7 @@ from api import get_instrument, get_reports
 
 from strategies.quality_strategy import QualityStrategy
 from strategies.value_strategy import ValueStrategy
+from strategies.growth_strategy import GrowthStrategy
 
 from investment_strategy import InvestmentStrategy
 
@@ -56,6 +57,15 @@ def analyze_instrument(ticker: str) -> ScreeningResult | None:
     if latest is None or previous is None:
         return None
 
+    # TODO:
+    # I en framtida version ska analysstrategi väljas automatiskt
+    # utifrån Instrument-information (sektor/bransch/bolagstyp).
+    # Exempel:
+    #   Industri            -> StandardStrategy
+    #   Bank                -> BankStrategy
+    #   Investmentbolag     -> InvestmentStrategy
+    #   Fastighetsbolag     -> RealEstateStrategy
+
     quality_result = QualityStrategy().evaluate(
         latest,
         previous,
@@ -68,9 +78,16 @@ def analyze_instrument(ticker: str) -> ScreeningResult | None:
         instrument_id,
     )
 
+    growth_result = GrowthStrategy().evaluate(
+        latest,
+        previous,
+        instrument_id,
+    )
+
     investment_result = InvestmentStrategy().evaluate(
         quality_result,
         value_result,
+        growth_result,
     )
 
     return ScreeningResult(
@@ -79,6 +96,7 @@ def analyze_instrument(ticker: str) -> ScreeningResult | None:
         previous_report=previous,
         quality=quality_result,
         value=value_result,
+        growth=growth_result,
         investment=investment_result,
     )
 
@@ -102,6 +120,7 @@ def run_analysis():
         result.previous_report,
         result.quality,
         result.value,
+        result.growth,
         result.investment,
     )
 
