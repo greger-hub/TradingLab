@@ -1,4 +1,5 @@
 from models import AnalysisResult, Metrics, ScoreItem
+from score import calculate_score
 
 
 def test_score_item_contains_transparent_scoring_detail():
@@ -33,3 +34,35 @@ def test_analysis_result_can_contain_score_items():
     assert result.score_items[0].name == "ROE"
     assert result.score_items[0].points == 20
     assert result.score_items[0].max_points == 25
+
+
+def test_calculate_score_populates_score_items():
+    current_report = {
+        "revenues": 120,
+        "profit_To_Equity_Holders": 24,
+        "operating_Income": 24,
+        "net_Debt": 30,
+        "total_Equity": 100,
+    }
+
+    previous_report = {
+        "revenues": 100,
+        "profit_To_Equity_Holders": 20,
+        "operating_Income": 20,
+        "net_Debt": 30,
+        "total_Equity": 100,
+    }
+
+    result = calculate_score(current_report, previous_report)
+
+    assert len(result.score_items) == 4
+
+    assert [item.name for item in result.score_items] == [
+        "Operating margin",
+        "Debt",
+        "ROE",
+        "Growth",
+    ]
+
+    assert all(item.max_points == 25 for item in result.score_items)
+    assert sum(item.points for item in result.score_items) == result.score
