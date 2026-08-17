@@ -1,4 +1,4 @@
-from models import AnalysisResult
+from models import AnalysisResult, Instrument
 from investment_strategy import InvestmentResult
 
 
@@ -18,9 +18,9 @@ def print_score_items(title: str, result: AnalysisResult):
 
 
 def print_report(
-    instrument,
-    latest,
-    previous,
+    instrument: Instrument,
+    latest: dict,
+    previous: dict,
     quality_result: AnalysisResult,
     value_result: AnalysisResult,
     growth_result: AnalysisResult,
@@ -31,7 +31,7 @@ def print_report(
     """
 
     print("\n================================================")
-    print(f"TradingLab Analysis - {instrument['name']}")
+    print(f"TradingLab Analysis - {instrument.name}")
     print("================================================")
 
     print(f"Senaste år: {latest['year']}")

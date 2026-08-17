@@ -1,19 +1,18 @@
 from dataclasses import dataclass
-from typing import Any
 
-from models import AnalysisResult
+from models import AnalysisResult, Instrument
 from investment_strategy import InvestmentResult
 
 
 @dataclass(frozen=True)
 class ScreeningResult:
     """
-    Complete analysis for one instrument.
+    Complete analysis for one provider-independent instrument.
     """
 
-    instrument: dict[str, Any]
-    latest_report: dict[str, Any]
-    previous_report: dict[str, Any]
+    instrument: Instrument
+    latest_report: dict
+    previous_report: dict
 
     quality: AnalysisResult
     value: AnalysisResult
