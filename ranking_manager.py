@@ -6,7 +6,7 @@ class RankingManager:
     Manages multiple independent rankings.
 
     Each ranking is identified by a name
-    (for example: quality, value, total).
+    (for example: quality, value, growth, total).
     """
 
     def __init__(self):
@@ -36,6 +36,17 @@ class RankingManager:
             instrument=instrument,
             score=score,
         )
+
+    def top(self, name: str, limit: int = 10) -> list:
+        """
+        Return the highest ranked companies.
+
+        Returns an empty list if the requested ranking does not exist.
+        """
+        if name not in self._rankings:
+            return []
+
+        return self._rankings[name].top(limit)
 
     def names(self) -> list[str]:
         """
