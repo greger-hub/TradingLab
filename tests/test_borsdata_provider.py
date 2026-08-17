@@ -68,3 +68,60 @@ def test_provider_does_not_expose_borsdata_specific_fields():
     assert not hasattr(instrument, "insId")
     assert not hasattr(instrument, "countryId")
     assert not hasattr(instrument, "stockPriceCurrency")
+
+
+def test_provider_handles_unknown_country_id():
+    data = {
+        "insId": 99,
+        "name": "Test",
+        "ticker": "TEST",
+        "countryId": 99,
+        "stockPriceCurrency": "EUR",
+    }
+
+    instrument = BorsdataProvider._to_instrument(data)
+
+    assert instrument.country == "99"
+
+
+def test_provider_handles_missing_country_id():
+    data = {
+        "insId": 100,
+        "name": "Test",
+        "ticker": "TEST",
+        "stockPriceCurrency": "SEK",
+    }
+
+    instrument = BorsdataProvider._to_instrument(data)
+
+    assert instrument.country == ""
+
+
+def test_provider_handles_missing_optional_fields():
+    data = {
+        "insId": 101,
+        "countryId": 1,
+    }
+
+    instrument = BorsdataProvider._to_instrument(data)
+
+    assert instrument.id == "101"
+    assert instrument.ticker == ""
+    assert instrument.name == ""
+    assert instrument.country == "SE"
+    assert instrument.currency == ""
+
+
+def test_provider_normalizes_instrument_id_to_string():
+    data = {
+        "insId": 123,
+        "name": "Test",
+        "ticker": "TEST",
+        "countryId": 1,
+        "stockPriceCurrency": "SEK",
+    }
+
+    instrument = BorsdataProvider._to_instrument(data)
+
+    assert instrument.id == "123"
+    assert isinstance(instrument.id, str)
