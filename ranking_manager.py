@@ -1,3 +1,4 @@
+from models import Instrument
 from ranking import Ranking
 
 
@@ -26,20 +27,24 @@ class RankingManager:
     def add_score(
         self,
         ranking_name: str,
-        instrument: str,
+        instrument: Instrument,
         score: float,
     ) -> None:
         """
-        Add a company score to a ranking.
+        Add an instrument score to a ranking.
         """
         self.get(ranking_name).add(
             instrument=instrument,
             score=score,
         )
 
-    def top(self, name: str, limit: int = 10) -> list:
+    def top(
+        self,
+        name: str,
+        limit: int = 10,
+    ) -> list:
         """
-        Return the highest ranked companies.
+        Return the highest ranked instruments.
 
         Returns an empty list if the requested ranking does not exist.
         """

@@ -1,12 +1,15 @@
 from dataclasses import dataclass
 
+from models import Instrument
+
 
 @dataclass(frozen=True)
 class RankingEntry:
     """
-    Represents one ranked company.
+    Represents one ranked instrument.
     """
-    instrument: str
+
+    instrument: Instrument
     score: float
 
 
@@ -14,18 +17,18 @@ class Ranking:
     """
     Generic ranking engine.
 
-    Stores a list of companies and their scores and can:
+    Stores instruments and their scores and can:
     - sort them
     - return Top N
-    - return a company's rank
+    - return an instrument's rank
     """
 
     def __init__(self):
         self._entries: list[RankingEntry] = []
 
-    def add(self, instrument: str, score: float) -> None:
+    def add(self, instrument: Instrument, score: float) -> None:
         """
-        Add a company score.
+        Add an instrument score.
         """
         self._entries.append(
             RankingEntry(
@@ -46,15 +49,15 @@ class Ranking:
 
     def top(self, limit: int = 10) -> list[RankingEntry]:
         """
-        Return the highest ranked companies.
+        Return the highest ranked instruments.
         """
         return self.sorted()[:limit]
 
-    def rank(self, instrument: str) -> int | None:
+    def rank(self, instrument: Instrument) -> int | None:
         """
         Return ranking position (1-based).
 
-        Returns None if company is not found.
+        Returns None if instrument is not found.
         """
         for position, entry in enumerate(self.sorted(), start=1):
             if entry.instrument == instrument:
