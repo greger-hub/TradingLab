@@ -1,3 +1,4 @@
+from models import Instrument
 from portfolio_entry import PortfolioEntry
 
 
@@ -10,7 +11,11 @@ class Portfolio:
     def entries(self) -> list[PortfolioEntry]:
         return self._entries
 
-    def add(self, instrument: str, score: float):
+    def add(
+        self,
+        instrument: Instrument,
+        score: float,
+    ) -> None:
         self._entries.append(
             PortfolioEntry(
                 instrument=instrument,
@@ -18,5 +23,5 @@ class Portfolio:
             )
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._entries)
