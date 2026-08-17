@@ -1,14 +1,18 @@
 from analysis import analyze_instrument
+from models import Instrument
 
 
 def test_analyze_instrument_builds_complete_result(monkeypatch):
 
     monkeypatch.setattr(
         "analysis.get_instrument",
-        lambda ticker: {
-            "name": "Test Company",
-            "insId": 1,
-        },
+        lambda ticker: Instrument(
+            id="1",
+            ticker="TEST",
+            name="Test Company",
+            country="SE",
+            currency="SEK",
+        ),
     )
 
     monkeypatch.setattr(
@@ -35,24 +39,24 @@ def test_analyze_instrument_builds_complete_result(monkeypatch):
 
     monkeypatch.setattr(
         "strategies.quality_strategy.get_kpi",
-        lambda _: {1: 20},
+        lambda _: {"1": 20},
     )
 
     monkeypatch.setattr(
         "strategies.value_strategy.get_kpi",
-        lambda _: {1: 10},
+        lambda _: {"1": 10},
     )
 
     monkeypatch.setattr(
         "strategies.growth_strategy.get_kpi",
-        lambda _: {1: 1},
+        lambda _: {"1": 1},
     )
 
     result = analyze_instrument("TEST")
 
     assert result is not None
 
-    assert result.instrument["name"] == "Test Company"
+    assert result.instrument.name == "Test Company"
 
     assert result.quality.score_items
     assert result.value.score_items

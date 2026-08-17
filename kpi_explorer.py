@@ -16,9 +16,9 @@ def main():
         print("Aktien hittades inte.")
         return
 
-    instrument_id = instrument["insId"]
+    instrument_id = instrument.id
 
-    print(f"\nBolag: {instrument['name']}")
+    print(f"\nBolag: {instrument.name}")
     print(f"Instrument-ID: {instrument_id}")
 
     try:

@@ -48,7 +48,7 @@ class PortfolioBuilder:
 
         for result in results[:size]:
             portfolio.add(
-                instrument=result.instrument["name"],
+                instrument=result.instrument.name,
                 score=result.quality.score,
             )
 

@@ -45,7 +45,7 @@ def analyze_instrument(ticker: str) -> ScreeningResult | None:
     if instrument is None:
         return None
 
-    instrument_id = instrument["insId"]
+    instrument_id = instrument.id
 
     reports = get_reports(instrument_id)
 
