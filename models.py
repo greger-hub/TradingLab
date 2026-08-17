@@ -1,6 +1,23 @@
 from dataclasses import dataclass, field
 
 
+@dataclass(frozen=True)
+class Instrument:
+    """
+    Provider-oberoende representation av ett finansiellt instrument.
+
+    Denna modell ägs av TradingLab och ska inte innehålla
+    leverantörsspecifika fält som exempelvis Börsdatas insId,
+    countryId eller marketId.
+    """
+
+    id: str
+    ticker: str
+    name: str
+    country: str
+    currency: str
+
+
 @dataclass
 class ScoreItem:
     """
