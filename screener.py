@@ -52,6 +52,12 @@ class Screener:
             )
 
             self._ranking_manager.add_score(
+                "growth",
+                name,
+                result.growth.score,
+            )
+
+            self._ranking_manager.add_score(
                 "total",
                 name,
                 result.investment.total_score,
