@@ -1,13 +1,7 @@
-from models import Instrument
+from unittest.mock import Mock
+
 from instrument_universe import InstrumentUniverse
-
-
-class FakeProvider:
-    def __init__(self, instruments: list[Instrument]):
-        self._instruments = instruments
-
-    def get_instruments(self) -> list[Instrument]:
-        return list(self._instruments)
+from models import Instrument
 
 
 def make_instruments():
@@ -33,71 +27,83 @@ def make_instruments():
             country="SE",
             currency="SEK",
         ),
-    ]
-
-
-def test_universe_returns_all_instruments():
-    provider = FakeProvider(make_instruments())
-    universe = InstrumentUniverse(provider)
-
-    result = universe.all()
-
-    assert len(result) == 3
-    assert result[0].name == "Volvo B"
-    assert result[1].name == "Investor B"
-    assert result[2].name == "Ericsson B"
-
-
-def test_universe_can_filter_by_country():
-    instruments = make_instruments()
-
-    instruments.append(
         Instrument(
             id="4",
             ticker="NOVO B",
             name="Novo Nordisk B",
             country="DK",
             currency="DKK",
-        )
-    )
+        ),
+    ]
 
-    provider = FakeProvider(instruments)
-    universe = InstrumentUniverse(provider)
+
+def make_universe():
+    provider = Mock()
+    provider.get_instruments.return_value = make_instruments()
+
+    return InstrumentUniverse(provider)
+
+
+def test_universe_returns_all_instruments():
+    universe = make_universe()
+
+    result = universe.all()
+
+    assert len(result) == 4
+    assert all(isinstance(instrument, Instrument) for instrument in result)
+
+
+def test_universe_returns_expected_instruments():
+    universe = make_universe()
+
+    result = universe.all()
+
+    assert result[0].ticker == "VOLV B"
+    assert result[1].ticker == "INVE B"
+    assert result[2].ticker == "ERIC B"
+    assert result[3].ticker == "NOVO B"
+
+
+def test_universe_can_filter_by_country():
+    universe = make_universe()
 
     result = universe.filter(country="SE")
 
     assert len(result) == 3
-    assert all(
-        instrument.country == "SE"
-        for instrument in result
-    )
+    assert all(instrument.country == "SE" for instrument in result)
 
 
-def test_universe_can_return_all_without_filter():
-    provider = FakeProvider(make_instruments())
-    universe = InstrumentUniverse(provider)
+def test_universe_can_filter_by_denmark():
+    universe = make_universe()
 
-    result = universe.filter()
+    result = universe.filter(country="DK")
 
-    assert len(result) == 3
+    assert len(result) == 1
+    assert result[0].ticker == "NOVO B"
 
 
 def test_universe_returns_empty_when_no_instruments_match():
-    provider = FakeProvider(make_instruments())
-    universe = InstrumentUniverse(provider)
+    universe = make_universe()
 
     result = universe.filter(country="NO")
 
     assert result == []
 
 
-def test_universe_returns_instrument_objects():
-    provider = FakeProvider(make_instruments())
+def test_universe_without_filter_returns_all():
+    universe = make_universe()
+
+    result = universe.filter()
+
+    assert len(result) == 4
+
+
+def test_universe_uses_provider():
+    provider = Mock()
+    provider.get_instruments.return_value = make_instruments()
+
     universe = InstrumentUniverse(provider)
 
-    result = universe.all()
+    universe.all()
 
-    assert all(
-        isinstance(instrument, Instrument)
-        for instrument in result
-    )
+    provider.get_instruments.assert_called_once()
