@@ -19,9 +19,10 @@ print("\nQuality scores:\n")
 
 for result in screener.results:
     print(
-        result.instrument["name"],
+        result.instrument.name,
         result.quality.score,
     )
+
 strategy = QualityPortfolioStrategy()
 
 portfolio = strategy.build(
