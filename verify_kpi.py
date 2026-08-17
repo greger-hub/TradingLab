@@ -1,9 +1,15 @@
 from api import get_instrument, get_kpi
 
+
 instrument = get_instrument("INVE B")
 
-print(instrument["insId"])
+if instrument is None:
+    print("Instrument hittades inte.")
+else:
+    instrument_id = instrument.id
 
-pe = get_kpi(2).get(instrument["insId"])
+    print(instrument_id)
 
-print(pe)
+    pe = get_kpi(2).get(instrument_id)
+
+    print(pe)
